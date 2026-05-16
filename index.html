@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arham Shah | Aerospace Engineering</title>
+    
+    <meta name="google-site-verification" content="vRfDbQOAfRxNnCZwXcXDxpSixpI3--P7yQKPMmgOwzw" />
+    <meta name="google-site-verification" content="lxDTKGzuWDNoJCI8rbRv3ti8KRFLcA-ne8AEnLPKstU" />
+    <meta name="description" content="Portfolio of Arham Shah, an Aerospace Engineering student at The University of Texas at Austin specializing in structures, FEA, and rocket engine test stands.">
+    <meta name="keywords" content="Arham Shah, Aerospace Engineering, UT Austin, Structures Engineer, FEA, SolidWorks, Longhorn Rocketry">
+    <meta name="author" content="Arham Shah">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Arham Shah | Aerospace Engineering Portfolio">
+    <meta property="og:description" content="Explore my aerospace engineering experience, research projects, and technical skills.">
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+
+    <style>
+        /* CSS Reset & Variables (Dark Mode Default) */
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-color: #bf5700; /* UT Burnt Orange */
+            --accent-glow: rgba(191, 87, 0, 0.4);
+            --border-color: #30363d;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        /* Light Mode Overrides */
+        body.light-mode {
+            --bg-color: #f9fafb;
+            --surface-color: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --accent-glow: rgba(191, 87, 0, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- SCROLL PLANE BANNER (Flattened & Pixel Perfect) --- */
+        #flight-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 9998;
+            display: none; /* Shown by JS */
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+        #flight-line {
+            position: absolute;
+            top: 24px; /* Dead center of 50px banner */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border-color);
+            transition: background-color 0.4s ease;
+        }
+        #flight-trail {
+            position: absolute;
+            top: 24px; /* Dead center of 50px banner */
+            left: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            width: 0px; 
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        #scroll-plane {
+            position: absolute;
+            top: 13px; /* 24px minus 11px (half of 22px plane height) puts center at exactly 24px */
+            left: 0; 
+            width: 22px;
+            height: 22px;
+            color: var(--accent-color);
+            filter: drop-shadow(0 0 5px var(--accent-glow));
+            will-change: transform;
+            z-index: 2; 
+        }
+
+        /* --- LOGIN SCREEN STYLES --- */
+        #login-screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; background-color: var(--bg-color); }
+        #login-screen h2 { font-family: var(--font-mono); font-size: 2.5rem; margin-bottom: 10px; color: var(--text-primary); }
+        #login-screen p { color: var(--text-secondary); margin-bottom: 30px; font-family: var(--font-mono); }
+        .login-btn { background-color: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); padding: 12px 24px; border-radius: 6px; font-size: 1.1rem; cursor: pointer; font-family: var(--font-mono); font-weight: bold; transition: all 0.3s ease; }
+        .login-btn:hover { background-color: var(--accent-color); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* --- PORTFOLIO LAYOUT --- */
+        #portfolio-wrapper { display: none; padding: 80px 2rem 2rem 2rem; }
+        .container { max-width: 900px; margin: 0 auto; position: relative; }
+
+        header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 2rem; margin-bottom: 2.5rem; gap: 20px; transition: border-color 0.4s ease; }
+        .header-text h1 { font-family: var(--font-mono); color: var(--text-primary); font-size: 2.5rem; margin-bottom: 0.2rem; text-shadow: 0 0 10px var(--accent-glow); }
+        .header-text h2 { color: var(--accent-color); font-size: 1.1rem; margin-bottom: 1rem; font-family: var(--font-mono); }
+        .contact-info { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 1rem; }
+        .contact-info a, .contact-info span { color: var(--text-secondary); text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem; transition: color 0.3s; }
+        .contact-info a:hover { color: var(--accent-color); }
+
+        .profile-img { width: 160px; height: 160px; border-radius: 8px; border: 2px solid var(--surface-color); box-shadow: 0 0 20px rgba(0,0,0,0.2); object-fit: cover; transition: transform 0.3s, border-color 0.3s; flex-shrink: 0; }
+        .profile-img:hover { transform: scale(1.03); border-color: var(--accent-color); }
+
+        section { margin-bottom: 3.5rem; }
+        .section-title { font-family: var(--font-mono); font-size: 1.4rem; color: var(--text-primary); margin-bottom: 1.5rem; display: flex; align-items: center; text-transform: uppercase; }
+        .section-title::before { content: ">"; color: var(--accent-color); margin-right: 10px; font-weight: bold; }
+
+        .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 1.5rem; margin-bottom: 1.5rem; transition: all 0.3s ease, background-color 0.4s ease, border-color 0.4s ease; opacity: 0; transform: translateY(20px); }
+        .card.visible { opacity: 1; transform: translateY(0); }
+        .card:hover { border-color: var(--accent-color); box-shadow: 0 4px 20px var(--accent-glow); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.8rem; transition: border-color 0.4s ease; }
+        .card-title { font-weight: bold; color: var(--text-primary); font-size: 1.1rem; }
+        .card-org { color: var(--accent-color); font-size: 0.95rem; font-family: var(--font-mono); margin-top: 4px; }
+        .card-date { color: var(--text-secondary); font-size: 0.85rem; font-family: var(--font-mono); white-space: nowrap; margin-left: 15px;}
+        
+        .sub-role { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border-color); transition: border-color 0.4s ease; }
+        .sub-role:first-of-type { margin-top: 1rem; padding-top: 0; border-top: none; }
+
+        ul { margin-left: 1.2rem; color: var(--text-primary); }
+        li { margin-bottom: 0.6rem; font-size: 0.95rem; }
+        li::marker { color: var(--accent-color); }
+
+        .edu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .tag-group { margin-bottom: 1rem; }
+        .tag-group-title { font-size: 0.9rem; color: var(--text-secondary); font-family: var(--font-mono); margin-bottom: 8px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { background-color: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.85rem; transition: all 0.3s ease; color: var(--text-primary); }
+        .tag:hover { border-color: var(--accent-color); background-color: var(--accent-color); color: #ffffff; }
+
+        .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; opacity: 0; transform: translateY(20px); }
+        .cert-grid.visible { opacity: 1; transform: translateY(0); transition: all 0.5s ease; }
+        .cert-item { background-color: var(--surface-color); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-color); padding: 10px 15px; font-size: 0.9rem; font-family: var(--font-mono); transition: all 0.4s ease; }
+
+        footer { text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem; margin-top: 2rem; font-family: var(--font-mono); color: var(--text-secondary); font-size: 0.85rem; transition: border-color 0.4s ease; }
+        .logout-btn { background: none; border: none; color: var(--accent-color); cursor: pointer; text-decoration: underline; font-family: var(--font-mono); margin-left: 10px; }
+
+        /* --- THEME TOGGLE BUTTON (ICON VERSION) --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        #theme-toggle:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        /* --- INTRO ANIMATION OVERLAY --- */
+        body.locked { overflow: hidden; }
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: var(--bg-color); z-index: 9999; display: none; justify-content: center; align-items: center; transition: opacity 0.6s ease-out, visibility 0.6s ease-out, background-color 0.4s ease; }
+        .streak { position: absolute; border-radius: 50%; border: 4px solid transparent; box-shadow: 0 0 20px transparent; }
+        .streak-1 { width: 100px; height: 100px; border-top: 4px solid var(--accent-color); border-right: 4px solid var(--accent-color); animation: scaleIn 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards, spin 1s linear infinite; }
+        .streak-2 { width: 150px; height: 150px; border-bottom: 4px dashed var(--accent-color); animation: scaleIn 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards 0.2s, spin 1.5s linear infinite reverse; }
+        .streak-3 { width: 200px; height: 200px; border-left: 4px dotted var(--accent-color); animation: scaleIn 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards 0.4s, spin 2s linear infinite; }
+        
+        #intro-screen.explode .streak-1 { animation: explodeOut 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards, spin 1s linear infinite !important; }
+        #intro-screen.explode .streak-2 { animation: explodeOut 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards, spin 1.5s linear infinite reverse !important; }
+        #intro-screen.explode .streak-3 { animation: explodeOut 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards, spin 2s linear infinite !important; }
+        #intro-screen.hidden { opacity: 0; visibility: hidden; }
+
+        @keyframes spin { from { rotate: 0deg; } to { rotate: 360deg; } }
+        @keyframes scaleIn { 0% { scale: 3; opacity: 0; } 100% { scale: 1; opacity: 1; box-shadow: 0 0 20px var(--accent-glow); } }
+        @keyframes explodeOut { 0% { scale: 1; opacity: 1; border-width: 4px; } 100% { scale: 60; opacity: 0; border-width: 20px; } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 650px) {
+            header { flex-direction: column-reverse; text-align: center; }
+            .contact-info { justify-content: center; }
+            .card-header { flex-direction: column; }
+            .card-date { margin-left: 0; margin-top: 5px; }
+            #theme-toggle { bottom: 15px; right: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>Arham Shah</h2>
+        <p>> SYSTEM_LOCKED: AUTHENTICATION REQUIRED</p>
+        <button class="login-btn" onclick="login()">INITIALIZE_LOGIN</button>
+    </div>
+
+    <div id="intro-screen">
+        <div class="streak streak-1"></div>
+        <div class="streak streak-2"></div>
+        <div class="streak streak-3"></div>
+    </div>
+
+    <div id="flight-banner">
+        <div id="flight-line"></div>
+        <div id="flight-trail"></div>
+        <svg id="scroll-plane" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.6l-1 2.5c-.1.3.1.7.4.8l6.3 2.5-3.2 3.2-3.1-1.1c-.4-.1-.8.1-1 .5l-1 1.7c-.2.3 0 .7.3.8l4.4 2.1 2.1 4.4c.1.3.5.5.8.3l1.7-1c.4-.2.6-.6.5-1l-1.1-3.1 3.2-3.2 2.5 6.3c.1.3.5.5.8.4l2.5-1c.4-.2.7-.6.6-1.1z"></path>
+        </svg>
+    </div>
+
+    <div id="portfolio-wrapper">
+        <button id="theme-toggle" aria-label="Toggle Theme"></button>
+        
+        <div class="container">
+            <header class="fade-in" style="animation: fadeInDown 1s ease-out;">
+                <div class="header-text">
+                    <h1>Arham Shah</h1>
+                    <h2>Aerospace Engineering Portfolio</h2>
+                    <div class="contact-info">
+                        <a href="tel:+12245092980">224-509-2980</a>
+                        <span style="color: var(--border-color);">|</span>
+                        <a href="mailto:arhamshah@utexas.edu">arhamshah@utexas.edu</a>
+                        <span style="color: var(--border-color);">|</span>
+                        <a href="https://www.linkedin.com/in/arhamjshah" target="_blank">LinkedIn</a>
+                        <span style="color: var(--border-color);">|</span>
+                        <a href="SpringResume.pdf" target="_blank">Resume</a>
+                    </div>
+                </div>
+                <img src="profile.jpg" alt="Arham Shah" class="profile-img">
+            </header>
+
+            <section>
+                <h2 class="section-title">Skills</h2>
+                <div class="card fade-in">
+                    <div class="tag-group">
+                      <div class="card-org">Technical</div>
+                        <div class="tags">
+                            <span class="tag">SolidWorks (CAD)</span>
+                            <span class="tag">FEA</span>
+                            <span class="tag">Structural Stress Analysis</span>
+                            <span class="tag">MATLAB</span>
+                            <span class="tag">C++</span>
+                            <span class="tag">Thermal Loading</span>
+                            <span class="tag">Thrust Frame Design</span>
+                            <span class="tag">Injector Feed Lines</span>
+                            <span class="tag">Flame Deflector Systems</span>
+                            <span class="tag">Soldering</span>
+                        </div>
+                    </div>
+                    <div class="tag-group" style="margin-top: 20px;">
+                        <div class="card-org">Operational</div>
+                        <div class="tags">
+                            <span class="tag">Technical Documentation</span>
+                            <span class="tag">Research Presentation</span>
+                            <span class="tag">Risk Assessment</span>
+                            <span class="tag">Safety Protocols</span>
+                            <span class="tag">Hazard Mitigation</span>
+                            <span class="tag">Data Analysis</span>
+                            <span class="tag">Project Management</span>
+                            <span class="tag">Operations Management</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title">Education</h2>
+                <div class="card fade-in">
+                    <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                        <div>
+                            <div class="card-title">The University of Texas at Austin</div>
+                            <div class="card-org">B.S. Aerospace Engineering</div>
+                        </div>
+                        <div class="card-date">08/2025 - 12/2028</div>
+                    </div>
+                    <div class="edu-grid" style="margin-top: 15px;">
+                        <div>
+                            <div class="tag-group-title">Relevant Coursework:</div>
+                            <div class="tags">
+                                <span class="tag">Engineering Computation</span>
+                                <span class="tag">Statics</span>
+                                <span class="tag">Applied Thermodynamics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title">Experience</h2>
+                
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Longhorn Rocketry Association, Austin, TX</div>
+                            <div class="card-org">Structures Engineer</div>
+                        </div>
+                        <div class="card-date">09/2025 - Present</div>
+                    </div>
+                    <ul>
+                        <li>Engineered a vertical rocket engine test stand capable of managing 3 Kilonewtons of thrust by designing a high-load thrust frame, specialized injector feed lines, and a custom flame deflector system.</li>
+                        <li>Ensured structure and deflector safety factor requirements were met by conducting comprehensive Finite Element Analysis (FEA) and stress analysis under high thermal loading.</li>
+                    </ul>
+                </div>
+
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">ACE Mentor Program of Dallas/Fort Worth, Frisco, TX</div>
+                            <div class="card-org">Engineering Consultant</div>
+                        </div>
+                        <div class="card-date">10/2024 - 02/2025</div>
+                    </div>
+                    <ul>
+                        <li>Executed a comprehensive design-build project by collaborating within a multidisciplinary engineering team and interfacing with architecture and construction professionals.</li>
+                        <li>Acquired practical project lifecycle expertise from schematic design to construction administration by analyzing immersive site visits and applying mentorship.</li>
+                    </ul>
+                </div>
+
+                <div class="card fade-in">
+                    <div class="card-header" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+                        <div>
+                            <div class="card-title">Young Jains of America/JAINA, Dallas, TX</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-role">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                            <div class="card-org" style="margin-top: 0;">College Chapters Team</div>
+                            <div class="card-date">10/2025 - Present</div>
+                        </div>
+                        <ul>
+                            <li>Empowered university students by collaborating within a specialized team to execute targeted leadership initiatives.</li>
+                            <li>Maximized youth engagement across collegiate demographics by aligning programmatic goals with core cultural values and community outreach strategies.</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-role">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                            <div class="card-org" style="margin-top: 0;">Multimedia Team Specialist</div>
+                            <div class="card-date">01/2022 - Present</div>
+                        </div>
+                        <ul>
+                            <li>Resolved 100+ end-user connectivity anomalies by engineering a virtual help desk and implementing troubleshooting protocols.</li>
+                            <li>Optimized broadcast reliability for events by configuring multimedia systems and actively monitoring real-time stream integrity.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title">Research Projects</h2>
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Simulated Catapult System</div>
+                            <div class="card-org">A Comparative Study of Airfoil Performance</div>
+                        </div>
+                        <div class="card-date">09/2021 - 05/2025</div>
+                    </div>
+                    <ul>
+                        <li>Improved aerodynamic design accuracy by 10% and optimized flight stability by conducting a comparative study of airfoil performance and analyzing lift-to-drag tradeoffs.</li>
+                        <li><strong>Project Link:</strong> <a href="https://shahphysics.weebly.com/aircraft-catapult.html" target="_blank" style="color: var(--accent-color);">shahphysics.weebly.com/aircraft-catapult.html</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title">Certifications</h2>
+                <div class="cert-grid fade-in">
+                    <div class="cert-item">Microsoft Office Specialist: Word Associate</div>
+                    <div class="cert-item">Microsoft Certified Educator</div>
+                    <div class="cert-item">Certiport: Intuit Personal Finance</div>
+                    <div class="cert-item">Forage: British Airways Data Science</div>
+                    <div class="cert-item">Google Cloud: Intro to Large Language Models</div>
+                    <div class="cert-item">Mathworks: MATLAB Onramp</div>
+                </div>
+            </section>
+
+            <footer>
+                <p>&copy; 2026 Arham Shah. All rights reserved. <button class="logout-btn" onclick="logout()">LOGOUT</button></p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- MASTER TOGGLE ---
+        const isMaintenanceMode = false; // Set to true to require login, false for public access.
+
+        let auth0Client = null;
+        const body = document.body;
+        const introScreen = document.getElementById('intro-screen');
+        const portfolioWrapper = document.getElementById('portfolio-wrapper');
+        const loginScreen = document.getElementById('login-screen');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        // --- ICON SVGs ---
+        const sunIcon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+        const moonIcon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+
+        // --- THEME TOGGLE LOGIC WITH LOCALSTORAGE ---
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            themeToggleBtn.innerHTML = moonIcon; 
+        } else {
+            themeToggleBtn.innerHTML = sunIcon; 
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            if (body.classList.contains('light-mode')) {
+                themeToggleBtn.innerHTML = moonIcon;
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeToggleBtn.innerHTML = sunIcon;
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // --- SCROLL PROGRESS AIRPLANE LOGIC ---
+        function initFlightPath() {
+            const flightBanner = document.getElementById('flight-banner');
+            const flightTrail = document.getElementById('flight-trail');
+            const plane = document.getElementById('scroll-plane');
+            const planeWidth = 22; 
+
+            // Make banner visible
+            flightBanner.style.display = 'block';
+
+            // Initial positioning
+            plane.style.transform = `translateX(0px) rotate(45deg)`;
+            flightTrail.style.width = '0px';
+
+            window.addEventListener('scroll', () => {
+                const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+                if (scrollTotal <= 0) return; 
+                
+                const scrollProgress = window.scrollY / scrollTotal;
+                
+                const maxTranslate = window.innerWidth - planeWidth;
+                const currentTranslate = scrollProgress * maxTranslate;
+                
+                plane.style.transform = `translateX(${currentTranslate}px) rotate(45deg)`;
+                
+                // Trail width tucks just beneath the tail of the plane
+                flightTrail.style.width = `${currentTranslate + 10}px`;
+            });
+        }
+
+        window.onload = async () => {
+            try {
+                // 1. Initialize Auth0
+                auth0Client = await auth0.createAuth0Client({
+                    domain: "dev-ez8tnew3w8menztx.us.auth0.com",
+                    clientId: "20hL84Ed4iohI5Nm2850MvwkdAeB5O7I",
+                    authorizationParams: { redirect_uri: window.location.origin }
+                });
+
+                // 2. Check Authentication & Maintenance Mode
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                const query = window.location.search;
+
+                if (query.includes("code=") && query.includes("state=")) {
+                    await auth0Client.handleRedirectCallback();
+                    window.history.replaceState({}, document.title, "/");
+                    showPortfolio();
+                } 
+                else if (!isMaintenanceMode || isAuthenticated) {
+                    showPortfolio();
+                } 
+                else {
+                    loginScreen.style.display = 'flex';
+                }
+            } catch (e) {
+                console.error("Auth System Error:", e);
+                showPortfolio(); 
+            }
+        };
+
+        // --- AUTH FUNCTIONS ---
+        const login = async () => { if(auth0Client) await auth0Client.loginWithRedirect(); };
+        const logout = () => { if(auth0Client) auth0Client.logout({ returnTo: window.location.origin }); };
+
+        // --- PORTFOLIO & ANIMATION TRIGGER ---
+        function showPortfolio() {
+            loginScreen.style.display = 'none';
+            portfolioWrapper.style.display = 'block';
+            
+            // Start Intro Animation
+            introScreen.style.display = 'flex';
+            body.classList.add('locked');
+
+            setTimeout(() => {
+                introScreen.classList.add('explode');
+                setTimeout(() => {
+                    introScreen.classList.add('hidden');
+                    body.classList.remove('locked');
+                    setTimeout(() => introScreen.remove(), 600); 
+                    
+                    // Start the plane script after intro finishes
+                    initFlightPath();
+
+                }, 800);
+            }, 1800);
+
+            // Initialize Scroll Observer for Cards
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }
+    </script>
+</body>
+</html>
