@@ -39,10 +39,12 @@ function requiredEnv(name: string): string {
 }
 
 const databaseUrl =
-  isProd
+  isVercelProduction
     ? requiredEnv('DATABASE_URL')
     : process.env.DATABASE_URL?.trim() || 'postgresql://localhost:5432/portfolio'
-const payloadSecret = process.env.PAYLOAD_SECRET?.trim() || 'replace-in-production'
+const payloadSecret = isVercelProduction
+  ? requiredEnv('PAYLOAD_SECRET')
+  : process.env.PAYLOAD_SECRET?.trim() || 'replace-in-production'
 
 function getR2Value(name: string): string | null {
   const value = process.env[name]?.trim()
@@ -145,5 +147,5 @@ export default buildConfig({
   },
   cors: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
   csrf: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
-  secret: isProd ? requiredEnv('PAYLOAD_SECRET') : payloadSecret,
+  secret: payloadSecret,
 })
