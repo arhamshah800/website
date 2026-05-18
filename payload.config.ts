@@ -26,6 +26,72 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const isProd = process.env.NODE_ENV === 'production'
+const isVercelProduction = process.env.VERCEL_ENV === 'production'
+
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (value && value.trim()) return value
+  if (isProd) {
+    throw new Error(`[payload-config] Missing required environment variable: ${name}`)
+  }
+  console.warn(`[payload-config] ${name} is not set. Using local development fallback.`)
+  return ''
+}
+
+const databaseUrl =
+  isProd
+    ? requiredEnv('DATABASE_URL')
+    : process.env.DATABASE_URL?.trim() || 'postgresql://localhost:5432/portfolio'
+const payloadSecret = process.env.PAYLOAD_SECRET?.trim() || 'replace-in-production'
+
+function getR2Value(name: string): string | null {
+  const value = process.env[name]?.trim()
+  if (value) return value
+  return null
+}
+
+const r2Bucket = getR2Value('CLOUDFLARE_R2_BUCKET')
+const r2Endpoint = getR2Value('CLOUDFLARE_R2_ENDPOINT')
+const r2AccessKeyId = getR2Value('CLOUDFLARE_R2_ACCESS_KEY_ID')
+const r2SecretAccessKey = getR2Value('CLOUDFLARE_R2_SECRET_ACCESS_KEY')
+
+const hasAnyR2Config = Boolean(
+  r2Bucket || r2Endpoint || r2AccessKeyId || r2SecretAccessKey,
+)
+
+if (
+  isVercelProduction &&
+  hasAnyR2Config &&
+  !(r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey)
+) {
+  throw new Error(
+    '[payload-config] Partial R2 configuration detected. Set all CLOUDFLARE_R2_* vars or none.',
+  )
+}
+
+const storagePlugins =
+  r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey
+    ? [
+        s3Storage({
+          enabled: true,
+          collections: {
+            'media-assets': {
+              disableLocalStorage: true,
+            },
+          },
+          bucket: r2Bucket,
+          config: {
+            endpoint: r2Endpoint,
+            credentials: {
+              accessKeyId: r2AccessKeyId,
+              secretAccessKey: r2SecretAccessKey,
+            },
+            region: 'auto',
+            forcePathStyle: true,
+          },
+        }),
+      ]
+    : []
 
 export default buildConfig({
   admin: {
@@ -42,7 +108,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/portfolio',
+      connectionString: databaseUrl,
     },
   }),
   collections: [
@@ -72,31 +138,12 @@ export default buildConfig({
     FeaturedSets,
   ],
   globals: [SiteSettings, SeoDefaults, Nav, Profile, About],
-  plugins: [
-    s3Storage({
-      enabled: Boolean(process.env.CLOUDFLARE_R2_ACCESS_KEY_ID),
-      collections: {
-        'media-assets': {
-          disableLocalStorage: true,
-        },
-      },
-      bucket: process.env.CLOUDFLARE_R2_BUCKET!,
-      config: {
-        endpoint: process.env.CLOUDFLARE_R2_ENDPOINT!,
-        credentials: {
-          accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
-        },
-        region: 'auto',
-        forcePathStyle: true,
-      },
-    }),
-  ],
+  plugins: storagePlugins,
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   cors: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
   csrf: [process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'],
-  secret: process.env.PAYLOAD_SECRET || 'replace-in-production',
+  secret: isProd ? requiredEnv('PAYLOAD_SECRET') : payloadSecret,
 })

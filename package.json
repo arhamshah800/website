@@ -8,7 +8,11 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
+    "test:proxy": "node --test tests/proxy-policy.test.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "verify:gate": "npm ci && npm run lint && npm run typecheck && npm run typecheck && npm run test:proxy && npm run build && npm run smoke",
+    "precheck": "npm run lint && npm run typecheck && npm run test:proxy",
     "payload:generate-types": "payload generate:types",
     "payload:migrate": "payload migrate"
   },
